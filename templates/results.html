@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-list-alt me-2"></i>SEO Results</h2>
+            <div>
+                <a href="{{ url_for('download_csv') }}" class="btn btn-success me-2">
+                    <i class="fas fa-download me-2"></i>Download CSV
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>New Search
+                </a>
+            </div>
+        </div>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h3 class="mb-0">Summary</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-globe me-2"></i>Website URL:</strong> {{ website_url }}</p>
+                        <p><strong><i class="fas fa-key me-2"></i>Target Keyword:</strong> {{ keyword }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if sheet_url %}
+                        <p><strong><i class="fas fa-table me-2"></i>Google Sheet:</strong> 
+                            <a href="{{ sheet_url }}" target="_blank">View Sheet</a>
+                        </p>
+                        {% endif %}
+                        <p><strong><i class="fas fa-list-ol me-2"></i>Generated Items:</strong> 
+                            {{ blogs|length }} Blog Posts, 
+                            {{ backlinks|length }} Backlink Opportunities, 
+                            {{ bookmarks|length }} Social Bookmarks
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Posts -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="fas fa-pencil-alt me-2"></i>Blog Posts</h3>
+                <button class="btn btn-sm btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#blogCollapse">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="collapse show" id="blogCollapse">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> Click on any blog title to expand the full content. Each blog post is ready to use for your website.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion" id="blogAccordion">
+                        {% for blog in blogs %}
+                        <div class="accordion-item blog-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#blog{{ loop.index }}">
+                                    <div class="blog-title-section">
+                                        <span class="blog-number badge bg-primary me-2">{{ loop.index }}</span>
+                                        <span class="blog-title">{{ blog.title }}</span>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="blog{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#blogAccordion">
+                                <div class="accordion-body">
+                                    <div class="blog-section">
+                                        <div class="blog-meta mb-3">
+                                            <span class="badge bg-secondary me-2"><i class="fas fa-tags me-1"></i>Keyword: {{ keyword }}</span>
+                                            <span class="badge bg-secondary"><i class="fas fa-globe me-1"></i>{{ website_url }}</span>
+                                        </div>
+                                        
+                                        <div class="blog-content">
+                                            {% if blog.content is defined and blog.content %}
+                                                {{ blog.content|replace('\n', '<br>')|safe }}
+                                            {% elif blog.post is defined and blog.post %}
+                                                {{ blog.post|replace('\n', '<br>')|safe }}
+                                            {% elif blog.blog_post is defined and blog.blog_post %}
+                                                {{ blog.blog_post|replace('\n', '<br>')|safe }}
+                                            {% else %}
+                                                <p class="text-muted">No content available for this blog post.</p>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="blog-actions mt-4 d-flex justify-content-between align-items-center">
+                                            <span class="text-muted"><i class="fas fa-info-circle me-1"></i>Approximately 
+                                                {% if blog.content is defined and blog.content %}
+                                                    {{ blog.content|length // 6 }}
+                                                {% elif blog.post is defined and blog.post %}
+                                                    {{ blog.post|length // 6 }}
+                                                {% elif blog.blog_post is defined and blog.blog_post %}
+                                                    {{ blog.blog_post|length // 6 }}
+                                                {% else %}
+                                                    0
+                                                {% endif %}
+                                                words
+                                            </span>
+                                            <div>
+                                                <button class="btn btn-outline-primary copy-blog-btn" data-blog-id="{{ loop.index }}">
+                                                    <i class="fas fa-copy me-1"></i> Copy Content
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backlink Opportunities -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="fas fa-link me-2"></i>Backlink Opportunities</h3>
+                <button class="btn btn-sm btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#backlinkCollapse">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="collapse show" id="backlinkCollapse">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> These backlink opportunities can help improve your website's domain authority and search rankings for <strong>{{ keyword }}</strong>.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        {% for backlink in backlinks %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 backlink-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <span class="badge bg-primary me-2">{{ loop.index }}</span>
+                                        {{ backlink.platform }}
+                                    </h5>
+                                    <span class="badge bg-info">DA/PA: High</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <h6 class="text-primary"><i class="fas fa-key me-2"></i>Target Keyword:</h6>
+                                        <p class="mb-0 ms-4"><span class="badge bg-secondary">{{ backlink.keyword }}</span></p>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-primary"><i class="fas fa-chess me-2"></i>Strategy:</h6>
+                                        <p class="mb-0 ms-4">{{ backlink.strategy }}</p>
+                                    </div>
+                                </div>
+                                <div class="card-footer d-flex justify-content-end">
+                                    <button class="btn btn-sm btn-outline-primary copy-strategy-btn" data-backlink-id="{{ loop.index }}">
+                                        <i class="fas fa-copy me-1"></i> Copy Strategy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-lightbulb me-2 text-warning"></i>Backlink Tips</h5>
+                                    <ul class="mb-0">
+                                        <li>Reach out to website owners with personalized emails</li>
+                                        <li>Offer unique, valuable content that their audience will appreciate</li>
+                                        <li>Follow up politely if you don't hear back within a week</li>
+                                        <li>Track your backlinks using tools like Ahrefs or SEMrush</li>
+                                        <li>Focus on quality over quantity for better SEO results</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Bookmarks -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="fas fa-bookmark me-2"></i>Social Bookmarks</h3>
+                <button class="btn btn-sm btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#bookmarkCollapse">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="collapse show" id="bookmarkCollapse">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> These social bookmarking posts can help drive traffic and increase visibility for your content about <strong>{{ keyword }}</strong>.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        {% for bookmark in bookmarks %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 bookmark-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">
+                                        <span class="badge bg-primary me-2">{{ loop.index }}</span>
+                                        {{ bookmark.title }}
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="platform-badge mb-3">
+                                        {% if 'Reddit' in bookmark.platform %}
+                                            <span class="badge bg-danger platform-badge"><i class="fab fa-reddit me-1"></i>{{ bookmark.platform }}</span>
+                                        {% elif 'Tumblr' in bookmark.platform %}
+                                            <span class="badge bg-info platform-badge"><i class="fab fa-tumblr me-1"></i>{{ bookmark.platform }}</span>
+                                        {% elif 'Mix' in bookmark.platform %}
+                                            <span class="badge bg-success platform-badge"><i class="fas fa-retweet me-1"></i>{{ bookmark.platform }}</span>
+                                        {% elif 'LinkedIn' in bookmark.platform %}
+                                            <span class="badge bg-primary platform-badge"><i class="fab fa-linkedin me-1"></i>{{ bookmark.platform }}</span>
+                                        {% elif 'Pinterest' in bookmark.platform %}
+                                            <span class="badge bg-danger platform-badge"><i class="fab fa-pinterest me-1"></i>{{ bookmark.platform }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary platform-badge"><i class="fas fa-share-alt me-1"></i>{{ bookmark.platform }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="card-text mb-0">{{ bookmark.description }}</p>
+                                </div>
+                                <div class="card-footer d-flex justify-content-between align-items-center">
+                                    <small class="text-muted"><i class="fas fa-hashtag me-1"></i>{{ keyword }}</small>
+                                    <button class="btn btn-sm btn-outline-primary copy-bookmark-btn" data-bookmark-id="{{ loop.index }}">
+                                        <i class="fas fa-copy me-1"></i> Copy Post
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-lightbulb me-2 text-warning"></i>Social Bookmarking Tips</h5>
+                                    <ul class="mb-0">
+                                        <li>Post content at optimal times when your target audience is most active</li>
+                                        <li>Engage with comments and feedback to boost visibility</li>
+                                        <li>Use relevant hashtags to expand your reach</li>
+                                        <li>Customize each post for the specific platform's audience and format</li>
+                                        <li>Track engagement metrics to refine your social sharing strategy</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

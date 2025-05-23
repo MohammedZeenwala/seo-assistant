@@ -1,0 +1,279 @@
+/**
+ * Custom styles for SEO Automation Tool
+ */
+
+/* Main container spacing */
+main.container {
+    min-height: calc(100vh - 250px);
+}
+
+/* Card styling */
+.card {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    font-weight: 500;
+}
+
+/* Feature boxes */
+.feature-box {
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.feature-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Form styling */
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Button hover effects */
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Accordion styling */
+.accordion-button:not(.collapsed) {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: var(--bs-primary);
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(13, 110, 253, 0.25);
+}
+
+/* Blog content formatting */
+.accordion-body {
+    white-space: pre-line;
+    text-align: justify;
+}
+
+/* Card styling for components */
+.backlink-card, .bookmark-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.backlink-card:hover, .bookmark-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.backlink-card .card-header, .bookmark-card .card-header {
+    background-color: rgba(13, 110, 253, 0.1);
+    font-weight: 500;
+}
+
+.blog-item {
+    margin-bottom: 1rem;
+    border: none;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.blog-item:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.blog-number {
+    min-width: 28px;
+    text-align: center;
+}
+
+.blog-title-section {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.blog-content {
+    line-height: 1.8;
+    font-size: 1rem;
+    text-align: justify;
+    padding: 0.5rem;
+    background-color: rgba(240, 240, 240, 0.2);
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--bs-primary);
+}
+
+.platform-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+/* Footer styling */
+footer {
+    margin-top: auto;
+}
+
+/* Table responsive styling */
+.table-responsive {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Loading state */
+.spinner-border {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Hide empty sections */
+.empty-section {
+    display: none;
+}
+
+/* Make sure text contrasts well with dark background */
+.bg-dark {
+    color: #fff;
+}
+
+/* Loading Animation Styles */
+.loading-container {
+    padding: 30px;
+    border-radius: 10px;
+    background-color: var(--bs-dark);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.seo-loader {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.search-icon {
+    background-color: var(--bs-primary);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    animation: pulse 1.5s infinite;
+}
+
+.loading-text {
+    flex: 1;
+    text-align: left;
+}
+
+.seo-animation {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.animation-item {
+    text-align: center;
+    padding: 15px;
+    border-radius: 8px;
+    width: 30%;
+    background-color: rgba(33, 37, 41, 0.8);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.animation-item i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+    color: var(--bs-info);
+}
+
+.animation-item span {
+    display: block;
+    font-size: 0.9rem;
+}
+
+.blog-icon {
+    animation: fadeInUp 0.5s ease forwards, bounce 3s 0.5s infinite;
+}
+
+.backlink-icon {
+    animation: fadeInUp 1s ease forwards, bounce 3s 1s infinite;
+}
+
+.bookmark-icon {
+    animation: fadeInUp 1.5s ease forwards, bounce 3s 1.5s infinite;
+}
+
+/* Animation Keyframes */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7);
+    }
+    70% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 15px rgba(13, 110, 253, 0);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    h2, h3 {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    .seo-animation {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .animation-item {
+        width: 80%;
+        margin-bottom: 15px;
+    }
+}
