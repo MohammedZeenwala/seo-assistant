@@ -1,7 +1,4 @@
 import os
-
-app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "fallback_secret_key")
 import logging
 import json
 import csv
@@ -19,9 +16,7 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.getenv("q!9V^kF9z#AeE@dS2&nP1$Wz")
-
-TOGETHER_API_KEY = os.getenv("tgp_v1_TAZIzhzvcLNui9yczKBCpb1hXOGvAl8dKr4buEksnVg")
+app.secret_key = os.environ.get("SESSION_SECRET")
 
 @app.route('/')
 def index():
@@ -36,45 +31,86 @@ def generate():
         website_url = request.form.get('website_url')
         keyword = request.form.get('keyword')
         
+        logging.debug(f"Form submission: website_url={website_url}, keyword={keyword}")
+        
         if not website_url or not keyword:
             flash('Please provide both website URL and target keyword', 'danger')
             return redirect(url_for('index'))
         
         # Generate SEO content using Together AI
+        logging.debug("Calling generate_seo_content")
         result = generate_seo_content(website_url, keyword)
+        logging.debug(f"generate_seo_content returned type: {type(result)}")
         
         # Check if we got an error message instead of data
         if isinstance(result, tuple) and len(result) == 2:
             error_type, error_msg = result
+            logging.error(f"Error from Together AI: {error_type} - {error_msg}")
             flash(f"{error_type}: {error_msg}", 'danger')
             return redirect(url_for('index'))
         
         # If we got valid SEO data
         seo_data = result
         
-        # Try to save to Google Sheets
-        sheet_result = save_to_google_sheets(website_url, keyword, seo_data)
+        # Log seo_data keys and structure for debugging
+        logging.debug(f"SEO data keys: {seo_data.keys() if isinstance(seo_data, dict) else 'Not a dictionary'}")
+        for key in seo_data.keys() if isinstance(seo_data, dict) else []:
+            logging.debug(f"Items in {key}: {len(seo_data.get(key, []))}")
         
-        # Check if we got an error from Google Sheets
-        if isinstance(sheet_result, tuple) and len(sheet_result) == 2:
-            # We still want to proceed, but inform the user about the sheets error
+        try:
+            # Try to save to Google Sheets
+            logging.debug("Calling save_to_google_sheets")
+            sheet_result = save_to_google_sheets(website_url, keyword, seo_data)
+            
+            # Check if we got an error from Google Sheets
+            if isinstance(sheet_result, tuple) and len(sheet_result) == 2:
+                # We still want to proceed, but inform the user about the sheets error
+                sheet_url = None
+                error_type, error_msg = sheet_result
+                logging.warning(f"Google Sheets error: {error_type} - {error_msg}")
+                flash(f"Google Sheets: {error_msg}", 'warning')
+            else:
+                sheet_url = sheet_result
+        except Exception as sheets_error:
+            logging.error(f"Error with Google Sheets: {str(sheets_error)}")
             sheet_url = None
-            error_type, error_msg = sheet_result
-            flash(f"Google Sheets: {error_msg}", 'warning')
-        else:
-            sheet_url = sheet_result
+            flash(f"Google Sheets error: {str(sheets_error)}", 'warning')
         
         # Store data in session for display and download
-        session['seo_data'] = seo_data
-        session['website_url'] = website_url
-        session['keyword'] = keyword
-        session['sheet_url'] = sheet_url
-        
-        # Redirect to results page
-        return redirect(url_for('results'))
+        try:
+            # Make sure seo_data is JSON serializable
+            if isinstance(seo_data, dict):
+                # Check blog posts format
+                if "blogs" in seo_data and isinstance(seo_data["blogs"], list):
+                    for i, blog in enumerate(seo_data["blogs"]):
+                        # Ensure each blog has a content field, check for alternative fields
+                        if "content" not in blog and "post" in blog:
+                            seo_data["blogs"][i]["content"] = blog["post"]
+                        elif "content" not in blog and "blog_post" in blog:
+                            seo_data["blogs"][i]["content"] = blog["blog_post"]
+                        
+                        # Ensure each blog has a title field
+                        if "title" not in blog:
+                            seo_data["blogs"][i]["title"] = f"Blog Post {i+1}"
+            
+            session['seo_data'] = seo_data
+            session['website_url'] = website_url
+            session['keyword'] = keyword
+            session['sheet_url'] = sheet_url
+            
+            logging.debug("Data stored in session successfully")
+            
+            # Redirect to results page
+            return redirect(url_for('results'))
+        except Exception as session_error:
+            logging.error(f"Error storing data in session: {str(session_error)}")
+            flash(f"Error storing results: {str(session_error)}", 'danger')
+            return redirect(url_for('index'))
         
     except Exception as e:
-        logging.error(f"Error generating SEO content: {str(e)}")
+        logging.error(f"Error in generate function: {str(e)}")
+        import traceback
+        logging.error(traceback.format_exc())
         flash(f'An error occurred: {str(e)}', 'danger')
         return redirect(url_for('index'))
 
