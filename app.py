@@ -16,7 +16,7 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET")
+app.secret_key = os.environ.get("q!9V^kF9z#AeE@dS2&nP1$Wz")
 
 @app.route('/')
 def index():
