@@ -18,6 +18,8 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = "q!9V^kF9z#AeE@dS2&nP1$Wz"
 
+TOGETHER_API_KEY = os.getenv("tgp_v1_TAZIzhzvcLNui9yczKBCpb1hXOGvAl8dKr4buEksnVg")
+
 @app.route('/')
 def index():
     """Render the home page with the SEO form."""
