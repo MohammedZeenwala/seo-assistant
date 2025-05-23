@@ -1,4 +1,7 @@
 import os
+
+app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "fallback_secret_key")
 import logging
 import json
 import csv
