@@ -2,3 +2,4 @@ gunicorn
 flask
 dotenv
 requests
+gspread
